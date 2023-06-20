@@ -11,6 +11,10 @@ let temperatureValue;
 let windSpeedValue;
 
 async function checkWeather(city) {
+  if (city.trim() === "") {
+    displayErrorMessage("Please enter a city name");
+    return;
+  }
   const unitSystem = isImperialUnit ? "imperial" : "metric";
   const response = await fetch(
     `${apiURL}q=${city}&appid=${apiKey}&units=${unitSystem}`
@@ -91,10 +95,17 @@ function setWeatherIcon(weatherMain) {
 }
 
 function toggleUnit() {
-  const unitSlider = document.getElementById("unitSlider");
-  isImperialUnit = unitSlider.value === "0"; // 0 represents Fahrenheit, 1 represents Celsius
-  updateTemperature();
-  updateWindSpeed();
+  const unitToggleBtn = document.querySelector(".unit-toggle");
+  unitToggleBtn.classList.toggle("imperial");
+  isImperialUnit = unitToggleBtn.classList.contains("imperial");
+  // Update temperature and wind speed by calling checkWeather() again
+  const city = document.querySelector(".city").innerHTML;
+  checkWeather(city);
+
+  // Update button text
+  unitToggleBtn.textContent = isImperialUnit
+    ? "Change to Imperial"
+    : "Change to Metric";
 }
 
 searchButton.addEventListener("click", () => {
@@ -137,5 +148,4 @@ async function getCityByCoordinates(latitude, longitude) {
   }
 }
 
-const unitSlider = document.getElementById("unitSlider");
-unitSlider.addEventListener("input", toggleUnit);
+document.querySelector(".unit-toggle").addEventListener("click", toggleUnit);
